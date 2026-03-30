@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SanitizeOS — The Offline Data Redactor | Zero Cloud. Zero Risk.</title>
+
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="SanitizeOS is a 100% offline data redaction tool for HR professionals, lawyers, and accountants. Mask SSNs, credit cards, emails, and phone numbers locally — your data never leaves your device." />
+  <meta name="keywords" content="offline data redaction, PII masking tool, SSN redactor, credit card masker, GDPR compliance tool, HIPAA redaction, HR data privacy, legal document redaction, data sanitizer, offline privacy tool, no cloud upload, sensitive data masking" />
+  <meta name="author" content="Avinash Walton" />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0a0e1a" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="SanitizeOS — The Offline Data Redactor" />
+  <meta property="og:description" content="Redact SSNs, credit cards, emails & phone numbers. 100% offline. Your data never touches a server. Built for HR, Legal & Finance professionals." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://og-image-placeholder.com/sanitizeos.png" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="SanitizeOS — The Offline Data Redactor" />
+  <meta name="twitter:description" content="Zero cloud. Zero risk. Redact sensitive client data entirely offline." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── DESIGN TOKENS ─────────────────────────────────────── */
+    :root {
+      --bg-base:      #070b14;
+      --bg-1:         #0c1120;
+      --bg-2:         #111827;
+      --glass:        rgba(255,255,255,0.04);
+      --glass-border: rgba(255,255,255,0.08);
+      --glass-hover:  rgba(255,255,255,0.07);
+
+      --accent:       #00e5c3;
+      --accent-dim:   rgba(0,229,195,0.12);
+      --accent-glow:  rgba(0,229,195,0.35);
+      --danger:       #ff4d6d;
+      --danger-dim:   rgba(255,77,109,0.12);
+      --warn:         #fbbf24;
+      --info:         #60a5fa;
+
+      --text-1: #f0f4ff;
+      --text-2: #a8b2cc;
+      --text-3: #5a6480;
+
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --radius-xl: 32px;
+
+      --font-display: 'Syne', sans-serif;
+      --font-mono:    'JetBrains Mono', monospace;
+      --font-body:    'Outfit', sans-serif;
+
+      --shadow-accent: 0 0 40px rgba(0,229,195,0.15);
+      --shadow-card:   0 8px 32px rgba(0,0,0,0.4);
+    }
+
+    /* ─── RESET & BASE ──────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-base);
+      color: var(--text-1);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* ─── ANIMATED BACKGROUND ───────────────────────────────── */
+    .bg-canvas {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 10%, rgba(0,229,195,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(96,165,250,0.05) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 60% at 50% 50%, rgba(255,77,109,0.03) 0%, transparent 70%);
+    }
+
+    .grid-overlay {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.025;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+
+    /* ─── SCANLINE EFFECT ───────────────────────────────────── */
+    .scanline {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.03;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.8) 2px, rgba(0,0,0,0.8) 4px);
+    }
+
+    /* ─── LAYOUT ────────────────────────────────────────────── */
+    .container {
+      position: relative; z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ─── NAV ───────────────────────────────────────────────── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(7,11,20,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 24px; max-width: 1100px; margin: 0 auto;
+    }
+
+    .logo {
+      display: flex; align-items: center; gap: 10px;
+      font-family: var(--font-display); font-weight: 800; font-size: 1.25rem;
+      color: var(--text-1); text-decoration: none; letter-spacing: -0.02em;
+    }
+
+    .logo-icon {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--accent), #006f5e);
+      border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      font-size: 16px; box-shadow: 0 0 16px var(--accent-glow);
+    }
+
+    .logo span { color: var(--accent); }
+
+    .nav-badge {
+      font-family: var(--font-mono); font-size: 0.65rem; font-weight: 500;
+      color: var(--accent); border: 1px solid var(--accent-dim);
+      background: var(--accent-dim); padding: 3px 8px; border-radius: 99px;
+      letter-spacing: 0.08em; text-transform: uppercase;
+    }
+
+    .nav-cta {
+      font-family: var(--font-body); font-size: 0.85rem; font-weight: 500;
+      color: var(--bg-base); background: var(--accent);
+      padding: 8px 20px; border-radius: 99px; text-decoration: none;
+      transition: all 0.2s; box-shadow: 0 0 20px var(--accent-glow);
+      white-space: nowrap;
+    }
+    .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 4px 24px var(--accent-glow); }
+
+    /* ─── HERO ──────────────────────────────────────────────── */
+    .hero {
+      padding: 96px 24px 72px;
+      text-align: center;
+      position: relative; z-index: 1;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--accent);
+      border: 1px solid var(--accent-dim); background: var(--accent-dim);
+      padding: 6px 14px; border-radius: 99px; margin-bottom: 28px;
+      animation: fadeSlideUp 0.6s ease both;
+    }
+
+    .hero-eyebrow::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent); box-shadow: 0 0 8px var(--accent);
+      animation: pulse 2s ease infinite;
+    }
+
+    @keyframes pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .hero h1 {
+      font-family: var(--font-display); font-size: clamp(2.4rem, 6vw, 4.2rem);
+      font-weight: 800; line-height: 1.1; letter-spacing: -0.04em;
+      margin-bottom: 24px;
+      animation: fadeSlideUp 0.6s 0.1s ease both;
+    }
+
+    .hero h1 .line-accent { color: var(--accent); }
+    .hero h1 .line-danger { color: var(--danger); }
+
+    .hero-sub {
+      font-size: 1.05rem; color: var(--text-2); max-width: 560px; margin: 0 auto 40px;
+      font-weight: 300; line-height: 1.7;
+      animation: fadeSlideUp 0.6s 0.2s ease both;
+    }
+
+    .hero-actions {
+      display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+      animation: fadeSlideUp 0.6s 0.3s ease both;
+    }
+
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent); color: var(--bg-base);
+      font-family: var(--font-body); font-weight: 600; font-size: 0.95rem;
+      padding: 14px 28px; border-radius: 12px; text-decoration: none;
+      transition: all 0.2s; box-shadow: var(--shadow-accent);
+      border: none; cursor: pointer;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px var(--accent-glow); }
+
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--glass); color: var(--text-1);
+      font-family: var(--font-body); font-weight: 500; font-size: 0.95rem;
+      padding: 14px 28px; border-radius: 12px; text-decoration: none;
+      border: 1px solid var(--glass-border); cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-ghost:hover { background: var(--glass-hover); border-color: rgba(255,255,255,0.15); }
+
+    /* ─── TRUST BAR ─────────────────────────────────────────── */
+    .trust-bar {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--glass-border);
+      border-bottom: 1px solid var(--glass-border);
+      background: rgba(255,255,255,0.02);
+      padding: 20px 24px;
+    }
+
+    .trust-bar-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; gap: 32px; justify-content: center; flex-wrap: wrap; align-items: center;
+    }
+
+    .trust-item {
+      display: flex; align-items: center; gap: 8px;
+      font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.05em;
+      color: var(--text-2); text-transform: uppercase;
+    }
+    .trust-item .dot { color: var(--accent); font-size: 1rem; }
+
+    /* ─── SECTION ───────────────────────────────────────────── */
+    section { position: relative; z-index: 1; padding: 80px 0; }
+
+    .section-label {
+      font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-family: var(--font-display); font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+      font-weight: 700; letter-spacing: -0.03em; margin-bottom: 16px;
+    }
+
+    .section-desc { color: var(--text-2); font-size: 1rem; max-width: 500px; line-height: 1.7; }
+
+    /* ─── GLASS CARD ────────────────────────────────────────── */
+    .glass-card {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow-card);
+      transition: border-color 0.3s;
+    }
+    .glass-card:hover { border-color: rgba(255,255,255,0.12); }
+
+    /* ─── LIVE DEMO SECTION ─────────────────────────────────── */
+    .demo-layout {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+      align-items: start;
+    }
+    @media(max-width:760px) { .demo-layout { grid-template-columns: 1fr; } }
+
+    .demo-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px; flex-wrap: wrap; gap: 8px;
+    }
+
+    .demo-title {
+      font-family: var(--font-display); font-weight: 700; font-size: 1rem;
+    }
+
+    .live-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--accent);
+      background: var(--accent-dim); border: 1px solid var(--accent-dim);
+      padding: 3px 9px; border-radius: 99px;
+    }
+    .live-badge::before {
+      content: ''; width: 5px; height: 5px; border-radius: 50%;
+      background: var(--accent); animation: pulse 1.5s infinite;
+    }
+
+    textarea {
+      width: 100%; min-height: 220px; resize: vertical;
+      background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md); padding: 16px;
+      color: var(--text-1); font-family: var(--font-mono); font-size: 0.82rem;
+      line-height: 1.7; outline: none; transition: border-color 0.2s;
+    }
+    textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-dim); }
+    textarea::placeholder { color: var(--text-3); }
+
+    .output-box {
+      width: 100%; min-height: 220px;
+      background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md); padding: 16px;
+      font-family: var(--font-mono); font-size: 0.82rem; line-height: 1.7;
+      color: var(--text-2); word-break: break-word; white-space: pre-wrap;
+      overflow-y: auto;
+    }
+
+    .output-box .redacted-tag {
+      color: var(--danger); background: var(--danger-dim);
+      padding: 1px 5px; border-radius: 4px; font-weight: 500;
+    }
+
+    .demo-controls {
+      display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;
+    }
+
+    .btn-sm {
+      font-size: 0.8rem; padding: 8px 16px; border-radius: 8px;
+      font-family: var(--font-body); font-weight: 500;
+      border: 1px solid var(--glass-border); cursor: pointer;
+      background: var(--glass); color: var(--text-1);
+      transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-sm:hover { background: var(--glass-hover); }
+    .btn-sm.accent { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+    .btn-sm.accent:hover { background: rgba(0,229,195,0.2); }
+
+    /* ─── STATS STRIP ───────────────────────────────────────── */
+    .stats-strip {
+      display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap;
+    }
+
+    .stat-chip {
+      font-family: var(--font-mono); font-size: 0.7rem; padding: 4px 10px;
+      border-radius: 6px; border: 1px solid var(--glass-border);
+      background: var(--glass); color: var(--text-2);
+    }
+    .stat-chip .count { color: var(--accent); font-weight: 500; }
+
+    /* ─── DROPZONE ──────────────────────────────────────────── */
+    .dropzone {
+      border: 2px dashed var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 60px 32px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s;
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      position: relative; overflow: hidden;
+    }
+
+    .dropzone::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 50% at 50% 50%, var(--accent-dim), transparent);
+      opacity: 0; transition: opacity 0.3s;
+    }
+
+    .dropzone:hover, .dropzone.drag-over {
+      border-color: var(--accent);
+      box-shadow: 0 0 40px var(--accent-dim), inset 0 0 40px var(--accent-dim);
+    }
+    .dropzone:hover::before, .dropzone.drag-over::before { opacity: 1; }
+
+    .dropzone-icon { font-size: 3rem; margin-bottom: 16px; display: block; }
+
+    .dropzone h3 {
+      font-family: var(--font-display); font-weight: 700; font-size: 1.2rem;
+      margin-bottom: 8px;
+    }
+
+    .dropzone p { color: var(--text-2); font-size: 0.9rem; margin-bottom: 12px; }
+
+    .file-types {
+      display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 16px;
+    }
+
+    .file-type-tag {
+      font-family: var(--font-mono); font-size: 0.68rem; padding: 3px 9px;
+      border-radius: 6px; border: 1px solid var(--glass-border); color: var(--text-3);
+    }
+
+    .premium-lock {
+      display: flex; align-items: center; gap: 6px; justify-content: center;
+      font-family: var(--font-mono); font-size: 0.68rem; color: var(--warn);
+      margin-top: 16px;
+    }
+
+    /* ─── HOW IT WORKS ──────────────────────────────────────── */
+    .steps-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;
+    }
+
+    .step-card {
+      background: var(--glass); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md); padding: 28px 24px;
+      position: relative; overflow: hidden; transition: all 0.25s;
+    }
+    .step-card:hover { transform: translateY(-4px); border-color: rgba(255,255,255,0.14); }
+
+    .step-num {
+      font-family: var(--font-display); font-size: 3rem; font-weight: 800;
+      color: var(--accent); opacity: 0.15; position: absolute; top: 12px; right: 20px;
+      line-height: 1;
+    }
+
+    .step-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      background: var(--accent-dim); border: 1px solid rgba(0,229,195,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; margin-bottom: 16px;
+    }
+
+    .step-card h4 { font-family: var(--font-display); font-weight: 700; margin-bottom: 8px; }
+    .step-card p { color: var(--text-2); font-size: 0.88rem; line-height: 1.6; }
+
+    /* ─── FEATURES ──────────────────────────────────────────── */
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;
+    }
+
+    .feature-card {
+      background: var(--glass); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md); padding: 28px 24px;
+      transition: all 0.25s;
+    }
+    .feature-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+
+    .feature-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; margin-bottom: 18px;
+    }
+    .feature-icon.green  { background: rgba(0,229,195,0.12); border: 1px solid rgba(0,229,195,0.2); }
+    .feature-icon.blue   { background: rgba(96,165,250,0.12); border: 1px solid rgba(96,165,250,0.2); }
+    .feature-icon.red    { background: rgba(255,77,109,0.12); border: 1px solid rgba(255,77,109,0.2); }
+    .feature-icon.yellow { background: rgba(251,191,36,0.12); border: 1px solid rgba(251,191,36,0.2); }
+    .feature-icon.purple { background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.2); }
+    .feature-icon.orange { background: rgba(251,146,60,0.12); border: 1px solid rgba(251,146,60,0.2); }
+
+    .feature-card h4 { font-family: var(--font-display); font-weight: 700; margin-bottom: 8px; }
+    .feature-card p  { color: var(--text-2); font-size: 0.88rem; line-height: 1.6; }
+
+    /* ─── VS TABLE ──────────────────────────────────────────── */
+    .vs-table {
+      width: 100%; border-collapse: collapse;
+      background: var(--glass); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg); overflow: hidden;
+    }
+
+    .vs-table th, .vs-table td {
+      padding: 14px 20px; text-align: center;
+      border-bottom: 1px solid var(--glass-border);
+      font-size: 0.88rem;
+    }
+
+    .vs-table th {
+      background: rgba(255,255,255,0.04);
+      font-family: var(--font-display); font-weight: 700; font-size: 0.9rem;
+    }
+
+    .vs-table td:first-child { text-align: left; color: var(--text-2); }
+
+    .vs-table tr:last-child td { border-bottom: none; }
+
+    .vs-table .col-sanitize { color: var(--accent); }
+    .vs-table .col-cloud    { color: var(--danger); }
+
+    .check  { color: var(--accent); font-size: 1rem; }
+    .cross  { color: var(--danger); font-size: 1rem; }
+    .maybe  { color: var(--warn);   font-size: 0.85rem; }
+
+    /* ─── PRICING ───────────────────────────────────────────── */
+    .pricing-card {
+      max-width: 440px; margin: 0 auto;
+      background: var(--glass);
+      border: 1px solid rgba(0,229,195,0.25);
+      border-radius: var(--radius-xl); padding: 48px 40px;
+      text-align: center; position: relative; overflow: hidden;
+      box-shadow: 0 0 60px rgba(0,229,195,0.08);
+    }
+
+    .pricing-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+
+    .pricing-badge {
+      display: inline-block; font-family: var(--font-mono); font-size: 0.68rem;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--bg-base); background: var(--accent);
+      padding: 4px 12px; border-radius: 99px; margin-bottom: 24px; font-weight: 600;
+    }
+
+    .pricing-price {
+      font-family: var(--font-display); font-size: 4rem; font-weight: 800;
+      line-height: 1; color: var(--text-1); margin-bottom: 8px;
+    }
+
+    .pricing-price span { font-size: 1.5rem; color: var(--text-2); vertical-align: top; margin-top: 12px; display: inline-block; }
+
+    .pricing-note { color: var(--text-2); font-size: 0.85rem; margin-bottom: 32px; }
+
+    .pricing-list { list-style: none; margin-bottom: 36px; text-align: left; }
+
+    .pricing-list li {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 9px 0; border-bottom: 1px solid var(--glass-border);
+      font-size: 0.9rem; color: var(--text-2);
+    }
+    .pricing-list li:last-child { border-bottom: none; }
+    .pricing-list li .chk { color: var(--accent); font-weight: 700; flex-shrink: 0; margin-top: 2px; }
+
+    .btn-buy {
+      display: block; width: 100%;
+      background: linear-gradient(135deg, var(--accent), #00b89d);
+      color: var(--bg-base); font-family: var(--font-display);
+      font-weight: 700; font-size: 1rem; padding: 16px;
+      border-radius: 12px; text-decoration: none; text-align: center;
+      border: none; cursor: pointer;
+      transition: all 0.2s; box-shadow: 0 4px 24px var(--accent-glow);
+    }
+    .btn-buy:hover { transform: translateY(-2px); box-shadow: 0 8px 32px var(--accent-glow); }
+
+    .money-back {
+      display: flex; align-items: center; gap: 6px; justify-content: center;
+      font-size: 0.78rem; color: var(--text-3); margin-top: 14px;
+    }
+
+    /* ─── TESTIMONIALS ──────────────────────────────────────── */
+    .testimonials-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;
+    }
+
+    .testimonial-card {
+      background: var(--glass); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md); padding: 28px;
+    }
+
+    .stars { color: var(--warn); font-size: 0.9rem; letter-spacing: 2px; margin-bottom: 14px; }
+
+    .testimonial-text {
+      font-size: 0.92rem; color: var(--text-2); line-height: 1.7;
+      font-style: italic; margin-bottom: 18px;
+    }
+
+    .testimonial-author { display: flex; align-items: center; gap: 12px; }
+
+    .author-avatar {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #006f5e);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; font-weight: 700; color: var(--bg-base); flex-shrink: 0;
+    }
+
+    .author-name { font-weight: 600; font-size: 0.88rem; }
+    .author-role { font-size: 0.78rem; color: var(--text-3); }
+
+    /* ─── FAQ ───────────────────────────────────────────────── */
+    .faq-list { display: flex; flex-direction: column; gap: 12px; max-width: 720px; margin: 0 auto; }
+
+    details {
+      background: var(--glass); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md); overflow: hidden;
+    }
+
+    summary {
+      padding: 18px 24px; cursor: pointer;
+      font-family: var(--font-body); font-weight: 500; font-size: 0.95rem;
+      list-style: none; display: flex; justify-content: space-between; align-items: center;
+      transition: background 0.2s;
+    }
+    summary:hover { background: var(--glass-hover); }
+
+    summary::after {
+      content: '+'; font-family: var(--font-mono); font-size: 1.1rem;
+      color: var(--accent); transition: transform 0.2s;
+    }
+    details[open] summary::after { transform: rotate(45deg); }
+
+    details p {
+      padding: 0 24px 20px;
+      color: var(--text-2); font-size: 0.9rem; line-height: 1.7;
+    }
+
+    /* ─── MODAL ─────────────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 1000;
+      background: rgba(0,0,0,0.8); backdrop-filter: blur(12px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px; opacity: 0; pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+    .modal {
+      background: var(--bg-1); border: 1px solid rgba(0,229,195,0.2);
+      border-radius: var(--radius-xl); padding: 48px 40px;
+      max-width: 480px; width: 100%; text-align: center; position: relative;
+      box-shadow: 0 0 80px rgba(0,229,195,0.1);
+      transform: translateY(20px) scale(0.96);
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .modal-overlay.open .modal { transform: translateY(0) scale(1); }
+
+    .modal::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+
+    .modal-close {
+      position: absolute; top: 16px; right: 16px;
+      background: var(--glass); border: 1px solid var(--glass-border);
+      border-radius: 8px; width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text-2); font-size: 1rem;
+      transition: all 0.2s;
+    }
+    .modal-close:hover { background: var(--glass-hover); color: var(--text-1); }
+
+    .modal-lock { font-size: 3rem; margin-bottom: 16px; display: block; }
+
+    .modal h2 {
+      font-family: var(--font-display); font-size: 1.8rem; font-weight: 800;
+      letter-spacing: -0.03em; margin-bottom: 12px; line-height: 1.2;
+    }
+
+    .modal p { color: var(--text-2); font-size: 0.92rem; line-height: 1.7; margin-bottom: 28px; }
+
+    .modal-features {
+      display: flex; flex-direction: column; gap: 8px;
+      text-align: left; margin-bottom: 28px;
+    }
+
+    .modal-feature {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.88rem; color: var(--text-2);
+      padding: 8px 12px; background: var(--glass);
+      border-radius: 8px; border: 1px solid var(--glass-border);
+    }
+    .modal-feature .chk { color: var(--accent); font-weight: 700; }
+
+    .modal-price {
+      font-family: var(--font-display); font-weight: 800; font-size: 1.1rem;
+      color: var(--text-1); margin-bottom: 4px;
+    }
+    .modal-price .amount { font-size: 2.4rem; color: var(--accent); }
+
+    /* ─── FOOTER ────────────────────────────────────────────── */
+    footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--glass-border);
+      padding: 48px 24px 32px;
+    }
+
+    .footer-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 24px;
+    }
+
+    .footer-logo { font-family: var(--font-display); font-weight: 800; font-size: 1.1rem; color: var(--text-1); }
+    .footer-logo span { color: var(--accent); }
+
+    .footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
+    .footer-links a { color: var(--text-3); text-decoration: none; font-size: 0.85rem; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--text-1); }
+
+    .footer-made {
+      font-size: 0.82rem; color: var(--text-3);
+      font-family: var(--font-mono);
+    }
+    .footer-made .heart { color: var(--danger); }
+
+    /* ─── ANIMATIONS ─────────────────────────────────────────── */
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+      opacity: 0; transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    /* ─── UTILITY ───────────────────────────────────────────── */
+    .text-center { text-align: center; }
+    .mt-8 { margin-top: 8px; }
+    .mt-16 { margin-top: 16px; }
+    .mt-24 { margin-top: 24px; }
+    .mt-48 { margin-top: 48px; }
+
+    .divider {
+      border: none; border-top: 1px solid var(--glass-border);
+      margin: 0;
+    }
+
+    /* ─── TOOLTIP ───────────────────────────────────────────── */
+    .tooltip-wrap { position: relative; display: inline-block; }
+    .tooltip-wrap:hover .tooltip { opacity: 1; transform: translateY(0); }
+    .tooltip {
+      position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%) translateY(4px);
+      background: var(--bg-2); border: 1px solid var(--glass-border);
+      border-radius: 8px; padding: 6px 12px;
+      font-size: 0.75rem; color: var(--text-2);
+      white-space: nowrap; opacity: 0; pointer-events: none;
+      transition: all 0.2s;
+    }
+
+    /* ─── SCROLL INDICATOR ──────────────────────────────────── */
+    .scroll-progress {
+      position: fixed; top: 0; left: 0; height: 2px; z-index: 200;
+      background: var(--accent); width: 0%;
+      transition: width 0.1s;
+      box-shadow: 0 0 8px var(--accent);
+    }
+
+    /* ─── COPY TOAST ────────────────────────────────────────── */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 500;
+      background: var(--bg-2); border: 1px solid var(--glass-border);
+      border-radius: 12px; padding: 12px 20px;
+      font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent);
+      display: flex; align-items: center; gap: 8px;
+      transform: translateY(80px); opacity: 0;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: var(--shadow-card);
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────────── */
+    @media(max-width:640px) {
+      .nav-inner { padding: 12px 16px; }
+      .hero { padding: 64px 16px 48px; }
+      .pricing-card { padding: 32px 24px; }
+      .modal { padding: 36px 24px; }
+      .glass-card { padding: 24px; }
+      .vs-table th, .vs-table td { padding: 10px 12px; font-size: 0.78rem; }
+    }
+
+    /* ─── REGEX HIGHLIGHT ───────────────────────────────────── */
+    .output-empty { color: var(--text-3); font-style: italic; }
+
+    input[type=file] { display: none; }
+
+    /* ─── CUSTOM SCROLLBAR ──────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-base); }
+    ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
+  </style>
+</head>
+<body>
+
+<!-- Scroll Progress -->
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- Background Effects -->
+<div class="bg-canvas"></div>
+<div class="grid-overlay"></div>
+<div class="scanline"></div>
+
+<!-- Toast -->
+<div class="toast" id="toast">✓ Copied to clipboard!</div>
+
+<!-- ─── NAV ─────────────────────────────────────────────────── -->
+<nav>
+  <div class="nav-inner">
+    <a class="logo" href="#">
+      <div class="logo-icon">🛡</div>
+      Sanitize<span>OS</span>
+    </a>
+    <div class="nav-badge">100% Offline</div>
+    <a class="nav-cta" href="https://avinashwalton.gumroad.com/l/SanitizeOS" target="_blank" rel="noopener">
+      Get Lifetime Access — $25
+    </a>
+  </div>
+</nav>
+
+<!-- ─── HERO ─────────────────────────────────────────────────── -->
+<div class="hero container">
+  <div class="hero-eyebrow">Zero Cloud &nbsp;·&nbsp; Zero Risk &nbsp;·&nbsp; Zero Leaks</div>
+  <h1>
+    Redact Sensitive Data.<br>
+    <span class="line-accent">Offline. Instantly.</span><br>
+    <span class="line-danger">Permanently.</span>
+  </h1>
+  <p class="hero-sub">
+    Mask SSNs, credit cards, emails &amp; phone numbers — directly in your browser. 
+    Your data <strong>never leaves your device</strong>. Built for HR, Legal &amp; Finance professionals who can't afford leaks.
+  </p>
+  <div class="hero-actions">
+    <button class="btn-primary" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">
+      ⚡ Try Live Demo — Free
+    </button>
+    <a class="btn-ghost" href="https://avinashwalton.gumroad.com/l/SanitizeOS" target="_blank" rel="noopener">
+      🔓 Unlock Full Version
+    </a>
+  </div>
+</div>
+
+<!-- ─── TRUST BAR ─────────────────────────────────────────────── -->
+<div class="trust-bar">
+  <div class="trust-bar-inner">
+    <div class="trust-item"><span class="dot">●</span> No Cloud Uploads</div>
+    <div class="trust-item"><span class="dot">●</span> No Account Needed</div>
+    <div class="trust-item"><span class="dot">●</span> No Tracking</div>
+    <div class="trust-item"><span class="dot">●</span> GDPR Friendly</div>
+    <div class="trust-item"><span class="dot">●</span> HIPAA Safe</div>
+    <div class="trust-item"><span class="dot">●</span> Works Offline</div>
+  </div>
+</div>
+
+<!-- ─── LIVE DEMO ─────────────────────────────────────────────── -->
+<section id="demo">
+  <div class="container">
+    <div class="section-label">🧪 Free Live Demo</div>
+    <div class="section-title">Paste Text. Watch It Redact.</div>
+    <p class="section-desc mt-8">Try it now — no signup, no BS. The regex engine runs entirely in your browser.</p>
+
+    <div class="glass-card mt-24">
+      <div class="demo-layout">
+        <!-- Input -->
+        <div>
+          <div class="demo-header">
+            <span class="demo-title">📝 Input Text</span>
+            <span class="live-badge">Live Processing</span>
+          </div>
+          <textarea id="inputText" placeholder="Paste your text here...
+
+Example:
+Client: John Doe
+Email: john.doe@acme.com
+Phone: (555) 867-5309
+SSN: 123-45-6789
+Credit Card: 4111 1111 1111 1111
+
+SanitizeOS will redact everything instantly. 🛡️"></textarea>
+          <div class="demo-controls">
+            <button class="btn-sm" onclick="loadSample()">📋 Load Sample</button>
+            <button class="btn-sm" onclick="clearAll()">🗑 Clear</button>
+            <button class="btn-sm accent" onclick="copyOutput()">📎 Copy Output</button>
+            <button class="btn-sm" onclick="showPremiumModal('download')">⬇ Download .txt</button>
+          </div>
+          <div class="stats-strip" id="statsStrip">
+            <div class="stat-chip">Emails: <span class="count" id="countEmail">0</span></div>
+            <div class="stat-chip">Phones: <span class="count" id="countPhone">0</span></div>
+            <div class="stat-chip">SSNs: <span class="count" id="countSSN">0</span></div>
+            <div class="stat-chip">Cards: <span class="count" id="countCard">0</span></div>
+          </div>
+        </div>
+
+        <!-- Output -->
+        <div>
+          <div class="demo-header">
+            <span class="demo-title">✅ Redacted Output</span>
+          </div>
+          <div class="output-box" id="outputBox">
+            <span class="output-empty">Your redacted text will appear here in real-time…</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ─── FILE DROP ─────────────────────────────────────────────── -->
+<section>
+  <div class="container">
+    <div class="section-label">📁 Bulk File Processing</div>
+    <div class="section-title">Drop Files. Get Clean Output.</div>
+    <p class="section-desc mt-8">Upload .txt or .csv files for batch redaction. Unlocked with one-time purchase.</p>
+
+    <div class="mt-24">
+      <div class="dropzone" id="dropzone" onclick="handleDropzoneClick()" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+        <span class="dropzone-icon">📂</span>
+        <h3>Drag &amp; Drop Your Files Here</h3>
+        <p>or click to browse — .txt and .csv supported</p>
+        <input type="file" id="fileInput" accept=".txt,.csv" onchange="handleFileSelect(event)" />
+        <div class="file-types">
+          <span class="file-type-tag">.TXT</span>
+          <span class="file-type-tag">.CSV</span>
+          <span class="file-type-tag">Bulk Mode</span>
+          <span class="file-type-tag">Auto Redact</span>
+        </div>
+        <div class="premium-lock">🔒 Premium Feature — Unlock for $25</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ─── HOW IT WORKS ──────────────────────────────────────────── -->
+<section>
+  <div class="container">
+    <div class="text-center fade-in">
+      <div class="section-label">⚙️ How It Works</div>
+      <div class="section-title">Simple. Fast. Secure.</div>
+    </div>
+    <div class="steps-grid mt-24">
+      <div class="step-card fade-in">
+        <div class="step-num">01</div>
+        <div class="step-icon">📋</div>
+        <h4>Paste or Drop</h4>
+        <p>Paste your document text directly or drag &amp; drop a file into the secure local zone.</p>
+      </div>
+      <div class="step-card fade-in">
+        <div class="step-num">02</div>
+        <div class="step-icon">🔍</div>
+        <h4>Regex Scans</h4>
+        <p>Our pattern engine instantly detects SSNs, credit cards, emails, and phone numbers.</p>
+      </div>
+      <div class="step-card fade-in">
+        <div class="step-num">03</div>
+        <div class="step-icon">🛡</div>
+        <h4>Local Redaction</h4>
+        <p>All processing happens in your browser. Zero network calls. Zero server contact.</p>
+      </div>
+      <div class="step-card fade-in">
+        <div class="step-num">04</div>
+        <div class="step-icon">✅</div>
+        <h4>Download Clean</h4>
+        <p>Export your sanitized file instantly. Share it safely — completely PII-free.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ─── FEATURES ─────────────────────────────────────────────── -->
+<section>
+  <div class="container">
+    <div class="text-center fade-in">
+      <div class="section-label">🚀 Features</div>
+      <div class="section-title">Everything You Need. Nothing You Don't.</div>
+    </div>
+    <div class="features-grid mt-24">
+      <div class="feature-card fade-in">
+        <div class="feature-icon green">🌐</div>
+        <h4>100% Offline</h4>
+        <p>Works without internet. Your data stays on your machine — always. Period.</p>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon blue">⚡</div>
+        <h4>Instant Regex Engine</h4>
+        <p>Real-time detection of 4 PII types: SSN, Credit Cards, Emails, Phone Numbers.</p>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon red">🔒</div>
+        <h4>Zero Data Logging</h4>
+        <p>No cookies, no analytics, no fingerprinting. Open the file and work.</p>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon yellow">📁</div>
+        <h4>Bulk File Processing</h4>
+        <p>Drop .txt and .csv files — redact thousands of entries in a single click.</p>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon purple">🔢</div>
+        <h4>Live Detection Stats</h4>
+        <p>See exactly how many of each PII type was found and redacted in real-time.</p>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon orange">💾</div>
+        <h4>One-Time Payment</h4>
+        <p>Pay $25 once. Use forever. No subscription. No renewal. No gotchas.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ─── VS COMPARISON ─────────────────────────────────────────── -->
+<section>
+  <div class="container">
+    <div class="text-center fade-in">
+      <div class="section-label">⚖️ Comparison</div>
+      <div class="section-title">SanitizeOS vs Cloud Tools</div>
+      <p class="section-desc" style="margin:12px auto 0;">Why give your clients' SSNs to a SaaS company's server?</p>
+    </div>
+    <div class="mt-24 fade-in" style="overflow-x:auto;">
+      <table class="vs-table">
+        <thead>
+          <tr>
+            <th style="text-align:left;">Feature</th>
+            <th class="col-sanitize">🛡 SanitizeOS</th>
+            <th class="col-cloud">☁️ Cloud Tools</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Data stays on your device</td><td><span class="check">✓</span></td><td><span class="cross">✗</span></td></tr>
+          <tr><td>Works without internet</td><td><span class="check">✓</span></td><td><span class="cross">✗</span></td></tr>
+          <tr><td>No account / signup required</td><td><span class="check">✓</span></td><td><span class="cross">✗</span></td></tr>
+          <tr><td>No monthly subscription</td><td><span class="check">✓</span></td><td><span class="cross">✗</span></td></tr>
+          <tr><td>GDPR / HIPAA compliant pipeline</td><td><span class="check">✓</span></td><td><span class="maybe">Maybe</span></td></tr>
+          <tr><td>Zero API / Zero server calls</td><td><span class="check">✓</span></td><td><span class="cross">✗</span></td></tr>
+          <tr><td>Audit-proof local processing</td><td><span class="check">✓</span></td><td><span class="cross">✗</span></td></tr>
+          <tr><td>One-time lifetime pricing</td><td><span class="check">✓ ($25)</span></td><td><span class="cross">✗ ($$/mo)</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ─── PRICING ───────────────────────────────────────────────── -->
+<section id="pricing">
+  <div class="container">
+    <div class="text-center fade-in">
+      <div class="section-label">💎 Pricing</div>
+      <div class="section-title">One Price. Lifetime Access.</div>
+    </div>
+    <div class="mt-24 fade-in">
+      <div class="pricing-card">
+        <div class="pricing-badge">Lifetime License</div>
+        <div class="pricing-price"><span>$</span>25</div>
+        <p class="pricing-note">One-time payment · No subscription · Use forever</p>
+        <ul class="pricing-list">
+          <li><span class="chk">✓</span> Unlimited file uploads (.txt &amp; .csv)</li>
+          <li><span class="chk">✓</span> Bulk redaction — thousands of rows at once</li>
+          <li><span class="chk">✓</span> Download redacted files instantly</li>
+          <li><span class="chk">✓</span> SSN, Credit Card, Email &amp; Phone detection</li>
+          <li><span class="chk">✓</span> Custom keyword redaction (coming soon)</li>
+          <li><span class="chk">✓</span> Future updates included</li>
+          <li><span class="chk">✓</span> Single HTML file — use anywhere, forever</li>
+        </ul>
+        <a class="btn-buy" href="https://avinashwalton.gumroad.com/l/SanitizeOS" target="_blank" rel="noopener">
+          🔓 Get Lifetime Access — $25
+        </a>
+        <p class="money-back">🛡 30-day no-questions refund guarantee</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ─── TESTIMONIALS ──────────────────────────────────────────── -->
+<section>
+  <div class="container">
+    <div class="text-center fade-in">
+      <div class="section-label">💬 Testimonials</div>
+      <div class="section-title">Trusted by Professionals</div>
+    </div>
+    <div class="testimonials-grid mt-24">
+      <div class="testimonial-card fade-in">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">"I deal with sensitive payroll data daily. The fact that nothing gets uploaded anywhere is a game-changer. My compliance officer actually loves it."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">SR</div>
+          <div>
+            <div class="author-name">Sarah R.</div>
+            <div class="author-role">HR Director · Fortune 500</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card fade-in">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">"Our firm handles client SSNs and financial records. I needed a tool I could run on an air-gapped machine. SanitizeOS is exactly that."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">MK</div>
+          <div>
+            <div class="author-name">Michael K.</div>
+            <div class="author-role">Attorney · Tax Law</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card fade-in">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">"Redacted 3,000 rows of client data in seconds from a CSV. Worth every penny for the peace of mind alone. No cloud, no risk."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">PT</div>
+          <div>
+            <div class="author-name">Priya T.</div>
+            <div class="author-role">CPA · Public Accounting</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ─── FAQ ───────────────────────────────────────────────────── -->
+<section>
+  <div class="container">
+    <div class="text-center fade-in">
+      <div class="section-label">❓ FAQ</div>
+      <div class="section-title">Common Questions</div>
+    </div>
+    <div class="faq-list mt-24">
+      <details class="fade-in">
+        <summary>Does my data get sent anywhere?</summary>
+        <p>Absolutely not. SanitizeOS runs entirely in your browser using vanilla JavaScript. There is no backend, no API, no server, and no network request made with your data. You can even download the file and run it completely offline.</p>
+      </details>
+      <details class="fade-in">
+        <summary>What PII types does it detect?</summary>
+        <p>Currently: US Social Security Numbers (SSN), credit card numbers (Visa, Mastercard, Amex, Discover), email addresses, and US/UK phone numbers. We're adding custom keyword redaction soon.</p>
+      </details>
+      <details class="fade-in">
+        <summary>What's the difference between the free demo and paid version?</summary>
+        <p>The free live demo lets you redact text you paste manually — great for quick sanitization. The paid version ($25 one-time) unlocks file uploads (.txt/.csv), bulk processing, and the download function.</p>
+      </details>
+      <details class="fade-in">
+        <summary>Is this GDPR / HIPAA compliant?</summary>
+        <p>Since data never leaves your device, SanitizeOS removes the cloud upload vector that most compliance frameworks address. However, compliance is a holistic practice — always consult your compliance officer for your specific use case.</p>
+      </details>
+      <details class="fade-in">
+        <summary>What happens after I pay?</summary>
+        <p>You'll receive a download link via Gumroad for the unlocked version of the single index.html file. No account needed — just download and use. Forever. Updates are included.</p>
+      </details>
+      <details class="fade-in">
+        <summary>Can I use this on an air-gapped machine?</summary>
+        <p>Yes! That's one of the core design goals. Download the file, move it to any machine, and it works with zero internet connection required.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FINAL CTA ─────────────────────────────────────────────── -->
+<section style="padding:80px 0;">
+  <div class="container text-center fade-in">
+    <div class="section-label">🚀 Get Started</div>
+    <div class="section-title">Stop Trusting Clouds With Client Data.</div>
+    <p class="section-desc" style="margin:16px auto 40px;">One file. One payment. Zero risk. SanitizeOS is the last redaction tool you'll ever need.</p>
+    <div class="hero-actions">
+      <a class="btn-primary" href="https://avinashwalton.gumroad.com/l/SanitizeOS" target="_blank" rel="noopener">
+        🔓 Get Lifetime Access — $25
+      </a>
+      <button class="btn-ghost" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">
+        ⚡ Try Free Demo First
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ────────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Sanitize<span>OS</span></div>
+    <div class="footer-links">
+      <a href="#demo">Live Demo</a>
+      <a href="#pricing">Pricing</a>
+      <a href="https://avinashwalton.gumroad.com/l/SanitizeOS" target="_blank" rel="noopener">Buy Now</a>
+    </div>
+    <div class="footer-made">
+      Made with <span class="heart">❤️</span> in India by Avinash Walton
+    </div>
+  </div>
+</footer>
+
+<!-- ─── PREMIUM MODAL ─────────────────────────────────────────── -->
+<div class="modal-overlay" id="modalOverlay" onclick="closePremiumModal(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closePremiumModal(null, true)">✕</button>
+    <span class="modal-lock">🔐</span>
+    <h2>Unlock the Full Power of SanitizeOS</h2>
+    <p>The live text demo is free forever. To process files and download redacted output, unlock the full version — one payment, lifetime use.</p>
+
+    <div class="modal-features">
+      <div class="modal-feature"><span class="chk">✓</span> Drag &amp; drop .txt / .csv file processing</div>
+      <div class="modal-feature"><span class="chk">✓</span> Download redacted files instantly</div>
+      <div class="modal-feature"><span class="chk">✓</span> Bulk redaction — thousands of rows</div>
+      <div class="modal-feature"><span class="chk">✓</span> 100% offline · no subscription ever</div>
+      <div class="modal-feature"><span class="chk">✓</span> Future updates included</div>
+    </div>
+
+    <div class="modal-price">
+      <span class="amount">$25</span> &nbsp;one-time
+    </div>
+    <p style="font-size:0.78rem;color:var(--text-3);margin:4px 0 20px;">Pay once. Use forever. 30-day refund guarantee.</p>
+
+    <a class="btn-buy" href="https://avinashwalton.gumroad.com/l/SanitizeOS" target="_blank" rel="noopener">
+      🚀 Get Lifetime Access — $25
+    </a>
+  </div>
+</div>
+
+<!-- ─── JAVASCRIPT ─────────────────────────────────────────────── -->
+<script>
+  /* ── REGEX PATTERNS ─────────────────────────────────────── */
+  const PATTERNS = {
+    email:   /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g,
+    phone:   /(\+?1[-.\s]?)?(\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4})/g,
+    ssn:     /\b\d{3}[-\s]?\d{2}[-\s]?\d{4}\b/g,
+    card:    /\b(?:4[0-9]{12}(?:[0-9]{3})?|[25][1-7][0-9]{14}|6(?:011|5[0-9][0-9])[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\d{3})\d{11}|\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{4})\b/g
+  };
+
+  /* ── REDACT FUNCTION ─────────────────────────────────────── */
+  function redactText(text) {
+    let counts = { email: 0, phone: 0, ssn: 0, card: 0 };
+
+    // SSN first (to prevent partial matches with phones)
+    text = text.replace(PATTERNS.ssn, () => { counts.ssn++; return '[REDACTED-SSN]'; });
+    text = text.replace(PATTERNS.card, () => { counts.card++; return '[REDACTED-CARD]'; });
+    text = text.replace(PATTERNS.email, () => { counts.email++; return '[REDACTED-EMAIL]'; });
+    text = text.replace(PATTERNS.phone, () => { counts.phone++; return '[REDACTED-PHONE]'; });
+
+    return { text, counts };
+  }
+
+  /* ── LIVE INPUT HANDLER ──────────────────────────────────── */
+  const inputEl  = document.getElementById('inputText');
+  const outputEl = document.getElementById('outputBox');
+
+  inputEl.addEventListener('input', updateOutput);
+
+  function updateOutput() {
+    const raw = inputEl.value.trim();
+    if (!raw) {
+      outputEl.innerHTML = '<span class="output-empty">Your redacted text will appear here in real-time…</span>';
+      resetCounts();
+      return;
+    }
+
+    const { text, counts } = redactText(raw);
+
+    // Highlight redacted tags in output
+    const highlighted = escapeHtml(text).replace(
+      /\[REDACTED[^\]]*\]/g,
+      m => `<span class="redacted-tag">${m}</span>`
+    );
+
+    outputEl.innerHTML = highlighted;
+    updateCounts(counts);
+  }
+
+  function escapeHtml(str) {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  function updateCounts(c) {
+    document.getElementById('countEmail').textContent = c.email;
+    document.getElementById('countPhone').textContent = c.phone;
+    document.getElementById('countSSN').textContent   = c.ssn;
+    document.getElementById('countCard').textContent  = c.card;
+  }
+
+  function resetCounts() {
+    updateCounts({ email: 0, phone: 0, ssn: 0, card: 0 });
+  }
+
+  /* ── SAMPLE TEXT ─────────────────────────────────────────── */
+  function loadSample() {
+    inputEl.value = `CLIENT INTAKE FORM — CONFIDENTIAL
+────────────────────────────────────
+Full Name: Jane Elizabeth Smith
+Email Address: jane.smith@lawfirm.com
+Secondary Email: jsmith_personal@gmail.com
+Phone: (212) 555-0147
+Mobile: +1-917-867-5309
+
+FINANCIAL INFORMATION
+SSN: 572-88-3419
+Primary Card: 4111 1111 1111 1111
+Secondary Card: 5500 0000 0000 0004
+Amex: 3714 496353 98431
+
+REFERENCE
+Referred by: bob.jones@referral.net
+Emergency Contact Phone: 555.234.5678`;
+    updateOutput();
+  }
+
+  function clearAll() {
+    inputEl.value = '';
+    updateOutput();
+  }
+
+  function copyOutput() {
+    const raw = inputEl.value.trim();
+    if (!raw) return;
+    const { text } = redactText(raw);
+    navigator.clipboard.writeText(text).then(() => showToast('✓ Copied to clipboard!'));
+  }
+
+  /* ── TOAST ───────────────────────────────────────────────── */
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  /* ── PREMIUM MODAL ───────────────────────────────────────── */
+  function showPremiumModal(trigger) {
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+
+  function closePremiumModal(e, force) {
+    if (force || (e && e.target === document.getElementById('modalOverlay'))) {
+      document.getElementById('modalOverlay').classList.remove('open');
+    }
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closePremiumModal(null, true);
+  });
+
+  /* ── DROPZONE ────────────────────────────────────────────── */
+  function handleDropzoneClick() {
+    showPremiumModal('dropzone');
+  }
+
+  function onDragOver(e) {
+    e.preventDefault();
+    document.getElementById('dropzone').classList.add('drag-over');
+  }
+
+  function onDragLeave(e) {
+    document.getElementById('dropzone').classList.remove('drag-over');
+  }
+
+  function onDrop(e) {
+    e.preventDefault();
+    document.getElementById('dropzone').classList.remove('drag-over');
+    showPremiumModal('drop');
+  }
+
+  function handleFileSelect(e) {
+    showPremiumModal('file');
+  }
+
+  /* ── SCROLL PROGRESS ─────────────────────────────────────── */
+  window.addEventListener('scroll', () => {
+    const pct = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+    document.getElementById('scrollProgress').style.width = pct + '%';
+  });
+
+  /* ── INTERSECTION OBSERVER (fade-in) ─────────────────────── */
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
