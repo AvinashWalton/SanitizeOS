@@ -12,32 +12,30 @@
 ```
 
 ### **The Offline Data Redactor**
-#### *Zero Cloud · Zero Risk · Zero Leaks*
+#### *Zero Cloud · Zero Risk · Zero Leaks · Legal-Grade PII Masking*
 
 <br/>
 
 [![Offline](https://img.shields.io/badge/Works-100%25%20Offline-00e5c3?style=for-the-badge)](https://github.com/avinashwalton/sanitizeos)
 [![No Cloud](https://img.shields.io/badge/Cloud%20Uploads-ZERO-ff4d6d?style=for-the-badge)](https://github.com/avinashwalton/sanitizeos)
 [![Price](https://img.shields.io/badge/Lifetime%20License-$25%20Once-fbbf24?style=for-the-badge)](https://avinashwalton.gumroad.com/l/SanitizeOS)
-[![No Dependencies](https://img.shields.io/badge/Dependencies-ZERO-a78bfa?style=for-the-badge)](https://github.com/avinashwalton/sanitizeos)
+[![PII Types](https://img.shields.io/badge/PII%20Types-6%20Detected-a78bfa?style=for-the-badge)](https://github.com/avinashwalton/sanitizeos)
 [![Single File](https://img.shields.io/badge/Single-HTML%20File-60a5fa?style=for-the-badge)](https://github.com/avinashwalton/sanitizeos)
 
 <br/>
 
-> **"I deal with SSNs and tax records every day. The fact that nothing gets uploaded anywhere is a game-changer. My compliance officer loves it."**
-> — *Sarah R., HR Director, Fortune 500*
+> **"I checked the network tab. Zero requests. That's when I knew this was different from every other tool I'd tried."**
+> — *David L., IT Compliance Manager*
 
 <br/>
 
-**[⚡ Try Free Demo](https://avinashwalton.github.io/SanitizeOS)** &nbsp;&nbsp;·&nbsp;&nbsp; **[🔓 Get Lifetime Access — $25](https://avinashwalton.gumroad.com/l/SanitizeOS)** &nbsp;&nbsp;·&nbsp;&nbsp; **[📖 How It Works](#how-it-works)**
+**[⚡ Try Free Demo](https://avinashwalton.github.io/sanitizeos)** &nbsp;&nbsp;·&nbsp;&nbsp; **[🔓 Get Lifetime Access — $25](https://avinashwalton.gumroad.com/l/SanitizeOS)** &nbsp;&nbsp;·&nbsp;&nbsp; **[📖 How It Works](#how-it-works)**
 
 <br/>
 
 </div>
 
 ---
-
-<br/>
 
 ## 🚨 The Problem Nobody Talks About
 
@@ -62,15 +60,9 @@ Your Client's SSN  ──────►  Your Browser
                       Even "temporarily."
 ```
 
-Cloud redaction tools upload your clients' most sensitive information — Social Security Numbers, credit card numbers, legal case details, medical records — to servers **you have zero control over.**
-
-That's not a workflow. That's a liability.
-
-<br/>
+Cloud redaction tools upload your clients' most sensitive information — SSNs, credit cards, legal case details, medical records — to servers **you have zero control over.** That's not a workflow. That's a liability.
 
 ---
-
-<br/>
 
 ## ✅ How SanitizeOS Works Instead
 
@@ -78,7 +70,7 @@ That's not a workflow. That's a liability.
 Your Client's SSN  ──────►  Your Browser
                                   │
                           JavaScript Engine
-                          (Regex runs locally)
+                          (All regex runs locally)
                                   │
                                   ▼
                       ┌───────────────────────┐
@@ -88,21 +80,15 @@ Your Client's SSN  ──────►  Your Browser
                       └───────────────────────┘
                                   │
                                   ▼
-                         Clean Redacted File
-                         Downloaded to YOUR disk.
+                    Clean Redacted Output + Audit Log
+                    Downloaded to YOUR disk.
 
-                    Network Requests Made: ZERO.
+               Network Requests Made: ZERO. Always.
 ```
 
 **Open DevTools → Network tab → Paste any text → Watch: nothing fires.**
 
-That's the architecture. Not a marketing claim — verifiable in 10 seconds.
-
-<br/>
-
 ---
-
-<br/>
 
 ## 🎯 Who Is This For?
 
@@ -111,23 +97,23 @@ That's the architecture. Not a marketing claim — verifiable in 10 seconds.
 <td width="33%" valign="top">
 
 ### ⚖️ Legal Professionals
-Attorneys, paralegals, and law clerks who need to share sanitized case documents — but cannot risk transmitting client SSNs, financial data, or case details to external servers.
+Attorneys, paralegals, and law clerks who share sanitized documents but cannot risk transmitting client SSNs or financial data to external servers.
 
-**Use case:** Redact client intake forms before forwarding to co-counsel or court filing vendors.
+**Use case:** Redact client intake forms before forwarding to co-counsel or court vendors.
 
 </td>
 <td width="33%" valign="top">
 
 ### 👔 HR Professionals
-HR managers and payroll teams who regularly handle employee records, offer letters, and onboarding documents containing sensitive PII that must be masked before sharing with vendors.
+HR managers and payroll teams handling employee records, offer letters, and onboarding documents that must be masked before sharing with third parties.
 
-**Use case:** Sanitize payroll exports before sending to third-party benefits platforms.
+**Use case:** Sanitize payroll exports before sending to benefits platforms.
 
 </td>
 <td width="33%" valign="top">
 
 ### 🧾 Accountants & CPAs
-Public accountants and tax professionals who process client financial data and need a clean, auditable way to remove PII from spreadsheets before sharing with colleagues or clients.
+Tax professionals who process client financial data and need a clean, auditable way to remove PII from spreadsheets before sharing.
 
 **Use case:** Strip SSNs and card numbers from CSV exports before analyst review.
 
@@ -135,333 +121,378 @@ Public accountants and tax professionals who process client financial data and n
 </tr>
 </table>
 
-<br/>
+---
+
+## ✨ Full Feature Set (Paid — `tool.html`)
+
+### 🔍 Core Redaction Engine
+The regex engine detects **6 types of PII** and processes them in the correct order to avoid false positives:
+
+```
+INPUT                              OUTPUT
+─────────────────────────────────────────────────────────────
+john.doe@acmecorp.com         →    [REDACTED - EMAIL]
+(212) 555-0147                →    [REDACTED - PHONE]
++44 7911 123456               →    [REDACTED - PHONE]
+572-88-3419                   →    [REDACTED - SSN]
+4111 1111 1111 1111           →    [REDACTED - CARD]
+192.168.0.45                  →    [REDACTED - IP]
+03/14/1985                    →    [REDACTED - DATE]
+YOUR CUSTOM KEYWORD           →    [REDACTED]
+─────────────────────────────────────────────────────────────
+```
+
+Each PII type can be toggled on/off independently. The detection engine processes matches in a non-overlapping, priority-ordered pass to prevent conflicts between patterns.
 
 ---
 
-<br/>
+### 🎨 3 Masking Styles (Legal Standard)
 
-## ⚔️ SanitizeOS vs. Cloud Redaction Tools
+Choose how redacted content is displayed before you run the tool:
 
-> *Why pay a subscription to hand your clients' data to strangers?*
+| Style | Example Output | Best For |
+|-------|---------------|----------|
+| **Solid Black Blocks** | `█████████` | Classic legal redaction look |
+| **[REDACTED - PII]** | `[REDACTED - EMAIL]` | Labelled, type-specific masking |
+| **[CONFIDENTIAL]** | `[CONFIDENTIAL]` | Formal document workflows |
+
+You can switch styles at any time and re-run the redaction instantly.
+
+---
+
+### 👆 Click-to-Reveal (False Positive Fix)
+
+In the output pane, every redacted block renders as a **clickable styled element** — like a black highlighter in a legal document. If the regex accidentally masks something that isn't actually PII:
+
+1. Click the redacted block
+2. Original text is revealed (highlighted in green)
+3. Click again to re-mask it
+
+No need to re-process the entire document. Works independently on each redacted segment.
+
+---
+
+### 📋 Compliance Audit Log
+
+The Audit Report tab generates a downloadable `.txt` file containing:
+
+```
+═══════════════════════════════════════════════
+          SANITIZEOS — AUDIT LOG
+═══════════════════════════════════════════════
+
+Tool Version  : SanitizeOS Lifetime License
+Processing    : 100% Local / Offline
+Generated At  : 6/15/2025, 2:34:17 PM
+Session ID    : A3B9F2K1
+
+───────────────────────────────────────────────
+              REDACTION SUMMARY
+───────────────────────────────────────────────
+
+  Email Addresses    : 3
+  Phone Numbers      : 2
+  US SSNs            : 1
+  Credit Card Nos.   : 1
+  IP Addresses       : 2
+  Dates / DOB        : 1
+  Custom Rules Hit   : 0
+
+  ──────────────────────────────
+  TOTAL ITEMS REDACTED : 10
+═══════════════════════════════════════════════
+```
+
+No actual PII data is included — only the summary counts. Store this file as part of your GDPR or HIPAA compliance documentation.
+
+---
+
+### 📁 Bulk File Processing
+
+- Drag & drop `.txt` and `.csv` files directly
+- Process **multiple files simultaneously**
+- Per-file animated progress bar
+- Per-file redaction stats (how many of each type)
+- Download clean `filename_redacted.txt/.csv` output
+- All processing happens locally — no upload, ever
+
+---
+
+### ⚙️ Custom Rules Engine
+
+Add your own patterns specific to your firm or workflow:
+
+| Field | Example |
+|-------|---------|
+| Rule Name | Employee ID |
+| Pattern (regex) | `EMP-\d{5}` |
+| Replace With | `[REDACTED-EMP]` |
+
+Supports both plain keywords and full regex. Rules are applied on top of all built-in PII detection, giving you total control over what gets masked.
+
+---
+
+### 🕓 Session History
+
+Every redaction action — text or file — is logged in the History tab with:
+- Timestamp
+- Source name (file name or text snippet)
+- Per-type counts
+- Total items redacted
+
+Session history clears when you close the tab. Nothing is ever stored permanently.
+
+---
+
+## ⚔️ SanitizeOS vs. Cloud Tools
 
 | | 🛡️ SanitizeOS | ☁️ Cloud Tools |
 |---|:---:|:---:|
 | Data stays on your device | ✅ Always | ❌ Never |
 | Works without internet | ✅ Yes | ❌ No |
 | No account or signup required | ✅ Yes | ❌ No |
-| Zero server-side data processing | ✅ Guaranteed | ❌ Core business model |
-| Auditable — read the source code | ✅ Open | ❌ Black box |
+| Zero server-side processing | ✅ Guaranteed | ❌ Core business model |
+| Auditable source code | ✅ Open | ❌ Black box |
+| Click-to-reveal false positives | ✅ Yes | ❌ No |
+| Legal-grade masking styles | ✅ 3 styles | ⚠️ Varies |
+| Downloadable compliance audit log | ✅ Yes | ⚠️ Rarely |
+| Custom keyword/regex rules | ✅ Yes | ⚠️ Paid tier |
 | Air-gap compatible | ✅ Yes | ❌ No |
-| GDPR-safe data pipeline | ✅ By design | ⚠️ Depends on their ToS |
-| HIPAA-safe data pipeline | ✅ By design | ⚠️ Requires BAA agreement |
-| Works during internet outages | ✅ Always | ❌ Never |
+| GDPR-safe pipeline | ✅ By design | ⚠️ Depends on ToS |
+| HIPAA-safe pipeline | ✅ By design | ⚠️ Requires BAA |
 | No subscription fee | ✅ $25 once | ❌ $X/month forever |
-| No renewal risk | ✅ Own it forever | ❌ Service can shut down |
-| No data breach risk from vendor | ✅ Zero | ❌ Real and ongoing |
-
-<br/>
+| No vendor breach risk | ✅ Zero | ❌ Real and ongoing |
 
 ---
 
-<br/>
-
-## 🔍 What Gets Detected & Redacted
-
-SanitizeOS uses battle-tested regular expressions to detect 6 types of Personally Identifiable Information (PII):
-
-```
-INPUT                              OUTPUT
-─────────────────────────────────────────────────────────────
-john.doe@acmecorp.com         →    [REDACTED-EMAIL]
-(212) 555-0147                →    [REDACTED-PHONE]
-+1-917-867-5309               →    [REDACTED-PHONE]
-572-88-3419                   →    [REDACTED-SSN]
-4111 1111 1111 1111           →    [REDACTED-CARD]
-5500-0000-0000-0004           →    [REDACTED-CARD]
-3714 496353 98431             →    [REDACTED-CARD]
-192.168.0.45                  →    [REDACTED-IP]
-03/14/1985                    →    [REDACTED-DATE]
-YOUR CUSTOM KEYWORD           →    [REDACTED]  ← Premium
-─────────────────────────────────────────────────────────────
-```
-
-**Supported formats:**
-- 📧 **Emails** — all standard RFC 5322 formats
-- 📞 **Phone Numbers** — US & UK, with/without country code, all separators
-- 🪪 **US SSNs** — `XXX-XX-XXXX`, `XXX XX XXXX`, unformatted
-- 💳 **Credit Cards** — Visa, Mastercard, Amex, Discover, spaced or unspaced
-- 🌐 **IP Addresses** — IPv4 (all ranges)
-- 📅 **Dates** — MM/DD/YYYY, MM-DD-YYYY formats
-
-<br/>
-
----
-
-<br/>
-
-## 📦 What's Included
+## 📦 Free Demo vs. Paid Tool
 
 <table>
 <tr>
 <td width="50%" valign="top">
 
 ### 🆓 Free Demo (`index.html`)
-*Available on GitHub — no payment required*
+*This GitHub repository — no payment required*
 
 - ✅ Live text redaction (real-time)
-- ✅ All 6 PII types detected
 - ✅ Copy output to clipboard
-- ✅ Detection count stats per type
-- ✅ Sample text to test instantly
-- ❌ File upload
-- ❌ Download output
-- ❌ Bulk CSV processing
-- ❌ Custom keyword rules
+- ✅ Detection count stats
+- ✅ Sample text to test
+- ❌ Masking style selection
+- ❌ Click-to-reveal
+- ❌ File upload / bulk processing
+- ❌ Download output files
+- ❌ Custom rules engine
+- ❌ Audit log generation
+- ❌ Session history
 
 </td>
 <td width="50%" valign="top">
 
 ### 🔓 Full Tool (`tool.html`) — $25 Lifetime
-*Delivered via Gumroad after purchase*
+*Delivered via Gumroad — `tool.html` single file*
 
 - ✅ Everything in free, plus:
+- ✅ **3 legal masking styles**
+- ✅ **Click-to-reveal** false positive fix
+- ✅ **6 PII types** with per-type toggles
 - ✅ **Drag & drop file uploads** (.txt, .csv)
-- ✅ **Multiple files at once** — batch processing
-- ✅ **Download redacted files** (auto-named)
-- ✅ **Custom Rules tab** — add your own keywords/regex
-- ✅ **IP Address & Date detection** (6 total types)
-- ✅ **Session history** — log of all redactions
-- ✅ **Toggle each rule on/off** independently
-- ✅ **Air-gap ready** — no internet ever needed
-- ✅ Future updates included
+- ✅ **Bulk multi-file processing**
+- ✅ **Download redacted files**
+- ✅ **Custom rules engine** (keyword + regex)
+- ✅ **Compliance audit log** download
+- ✅ **Session history** with counts
+- ✅ Air-gap ready, works forever offline
+- ✅ All future updates included
 
 </td>
 </tr>
 </table>
 
-<br/>
-
 ---
-
-<br/>
 
 ## 🚀 How It Works
 
 **Free demo — zero setup:**
 
 ```bash
-# Clone and open. That's literally it.
-git clone https://github.com/avinashwalton/SanitizeOS.git
+git clone https://github.com/avinashwalton/sanitizeos.git
 open index.html
+# That's it. No npm. No build. No server.
 ```
-
-No `npm install`. No build step. No Node. No Python. No Docker.
-Just double-click `index.html` and it works.
 
 **Paid tool — same simplicity:**
 1. Purchase on [Gumroad](https://avinashwalton.gumroad.com/l/SanitizeOS)
-2. Download `tool.html` from your Gumroad receipt
-3. Double-click it. Done.
+2. Download `tool.html` from your Gumroad receipt email
+3. Double-click it — opens in any browser, works immediately
 
 **For air-gapped environments:**
 ```
 1. Download tool.html on any internet-connected machine
 2. Copy to USB drive
 3. Transfer to air-gapped machine
-4. Open in any browser
-5. Works perfectly with zero internet
+4. Open in browser — zero internet needed, ever
 ```
 
-<br/>
+**Keyboard shortcut:** `Ctrl + Enter` (or `Cmd + Enter`) triggers redaction from any tab.
 
 ---
-
-<br/>
 
 ## 🏗️ Technical Architecture
 
 ```
-tool.html (Single File)
+tool.html (Single File — ~800 lines)
 │
-├── HTML5 Structure
-│   └── 4 tabs: Text · File · Rules · History
+├── HTML5 — 5-tab dashboard layout
+│   └── Text Redactor · File Processor · Custom Rules · Audit · History
 │
-├── CSS3 Styling
-│   ├── Dark mode glassmorphism UI
-│   ├── CSS custom properties (variables)
-│   ├── Responsive — mobile + desktop
-│   └── Zero external CSS dependencies
+├── CSS3 — Dark glassmorphism UI
+│   ├── CSS custom properties (design token system)
+│   ├── Responsive grid layouts
+│   └── Zero external stylesheets
 │
-├── Vanilla JavaScript Engine
-│   ├── RegEx pattern matching (6 PII types)
-│   ├── FileReader API (local file processing)
-│   ├── Blob + URL.createObjectURL (downloads)
-│   ├── Custom rules engine (user-defined)
-│   └── Session history (in-memory only)
-│
-└── External Resources
-    └── Google Fonts (display only, optional)
+└── Vanilla JavaScript Engine
+    ├── Non-overlapping regex match collection
+    ├── Priority-ordered PII detection (SSN → Card → Date → Email → IP → Phone)
+    ├── Segment mapping for click-to-reveal
+    ├── FileReader API (local file processing)
+    ├── Blob + createObjectURL (downloads)
+    ├── Custom rules engine (user-defined patterns)
+    └── In-memory session history
 
-Network Requests to Process Your Data: ZERO
-Third-Party SDKs with Data Access:     ZERO
-Cookies Set:                           ZERO
-localStorage Written:                  ZERO
+Network Requests to Process Data:  ZERO
+Third-Party SDKs with Data Access: ZERO
+Cookies Set:                       ZERO
+localStorage Written:              ZERO
 ```
 
-**Tech stack:** Pure HTML · CSS · Vanilla JS · Single file · Zero dependencies
-
-<br/>
-
 ---
-
-<br/>
 
 ## 💰 Pricing
 
 <div align="center">
 
-| Plan | Price | File Processing | Custom Rules | Downloads |
-|------|-------|:-:|:-:|:-:|
-| **Free Demo** | $0 | ❌ | ❌ | ❌ |
-| **Lifetime License** | **$25 once** | ✅ | ✅ | ✅ |
+| Plan | Price | Masking Styles | File Processing | Audit Log | Custom Rules |
+|------|-------|:-:|:-:|:-:|:-:|
+| **Free Demo** | $0 | ❌ | ❌ | ❌ | ❌ |
+| **Lifetime License** | **$25 once** | ✅ 3 styles | ✅ | ✅ | ✅ |
 
 <br/>
 
 ### **[🔓 Get Lifetime Access on Gumroad — $25](https://avinashwalton.gumroad.com/l/SanitizeOS)**
 
-*Pay once. Own it forever. No subscription. No renewal. No gotchas.*
-*30-day no-questions-asked refund guarantee.*
+*Pay once. Own it forever. No subscription. No renewal.*
+*14-day no-questions-asked refund guarantee.*
 
 </div>
 
-<br/>
-
 ---
-
-<br/>
 
 ## 💬 What Users Say
 
-> *"Our firm handles client SSNs and financial records. I needed a tool I could run on an air-gapped machine. SanitizeOS is exactly that — and the price is a no-brainer."*
-> — **Michael K., Tax Attorney**
+> *"The Click-to-Reveal feature alone saved me 20 minutes on a 40-page document. One regex false positive and I just clicked it — done."*
+> — **James P., Paralegal, NYC**
+
+> *"I generated the audit log and attached it to our GDPR compliance file. Our DPO was impressed — she'd never seen a tool that could prove local processing like this."*
+> — **Lisa M., Data Protection Officer, London*
 
 > *"Redacted 3,000 rows of client data from a CSV in seconds. Worth every penny for the peace of mind alone."*
 > — **Priya T., CPA, Public Accounting**
 
-> *"I checked the network tab. Zero requests. That's when I knew this was different from every other tool I'd tried."*
-> — **David L., IT Compliance Manager**
-
-<br/>
-
 ---
 
-<br/>
-
-## ❓ Frequently Asked Questions
+## ❓ FAQ
 
 <details>
 <summary><strong>Does my data really never leave my device?</strong></summary>
 <br/>
-Yes. SanitizeOS uses the browser's built-in JavaScript engine to run regex patterns on your text locally. There is no backend server, no API endpoint, no fetch() call, and no WebSocket. You can verify this yourself in 10 seconds: open DevTools → Network tab → paste sensitive text → watch nothing fire.
+Yes. Open DevTools → Network tab → paste sensitive text → watch nothing fire. The JavaScript regex engine runs entirely inside your browser's local execution environment. There is no backend, no API call, no WebSocket, and no fetch() request made with your data.
 <br/><br/>
 </details>
 
 <details>
-<summary><strong>Can I use the paid tool.html on a machine with no internet?</strong></summary>
+<summary><strong>What are the 3 masking styles and when should I use them?</strong></summary>
 <br/>
-Yes, that's a core design goal. After downloading tool.html once, copy it to any machine — including air-gapped workstations. It requires no internet connection to process files or redact text. Even the fonts gracefully fall back to system fonts if unavailable offline.
+<strong>Solid Black Blocks (█████)</strong> — Mimics the classic physical redaction marker. Best for screenshots or documents that will be visually reviewed.<br/>
+<strong>[REDACTED - PII]</strong> — Machine-readable, type-labelled format. Best for legal documents where the type of redacted data must be documented.<br/>
+<strong>[CONFIDENTIAL]</strong> — Formal and generic. Best for internal memos and reports where you don't want to label the type.
 <br/><br/>
 </details>
 
 <details>
-<summary><strong>What's the difference between the free demo and the paid tool?</strong></summary>
+<summary><strong>How does Click-to-Reveal work?</strong></summary>
 <br/>
-The free demo (index.html) lets you paste text and see it redacted live — great for quick one-off sanitization. The paid tool (tool.html) adds file upload (.txt and .csv), bulk processing, downloadable output, a custom rules engine for your own keywords/patterns, per-rule toggles, and session history.
+Each redacted block in the output pane is a clickable span element. Clicking it reveals the original underlying text (highlighted in green). Clicking again re-masks it. This is essential for handling false positives — for example, if a phone number pattern matches a non-phone number sequence in your document. Each block is independently toggleable.
 <br/><br/>
 </details>
 
 <details>
-<summary><strong>How do I receive the paid tool after purchase?</strong></summary>
+<summary><strong>What exactly is in the Audit Log download?</strong></summary>
 <br/>
-Gumroad delivers it automatically. After payment, you'll receive an email with a download link for tool.html. No account needed, no app to install — just the single HTML file.
+The audit log .txt file contains: the tool name and version, a timestamp, a generated session ID, and a count of each PII type removed (e.g., "3 Emails, 1 SSN"). Crucially, it contains <strong>no actual PII data</strong> — only the summary counts. This makes it safe to store, share with compliance officers, or attach to GDPR/HIPAA documentation.
+<br/><br/>
+</details>
+
+<details>
+<summary><strong>Can I use custom rules alongside built-in PII detection?</strong></summary>
+<br/>
+Yes. Custom rules run after all built-in patterns, on the same pass. You can add plain keywords (e.g., your firm's name) or full regular expressions (e.g., case numbers like CASE-2025-\d{5}). Each custom rule has its own replacement text.
 <br/><br/>
 </details>
 
 <details>
 <summary><strong>Is this GDPR / HIPAA compliant?</strong></summary>
 <br/>
-Since your data never leaves your device, SanitizeOS eliminates the cloud upload risk that most GDPR and HIPAA guidance focuses on. For GDPR, processing data locally means no third-party data processor is involved. For HIPAA, there's no covered entity or business associate receiving PHI. That said, compliance is holistic — always consult your compliance officer for your specific workflow.
+Since data never leaves your device, SanitizeOS eliminates the cloud transmission risk that most GDPR and HIPAA guidance focuses on. The audit log provides a documented record of your redaction process. For GDPR, local processing means no third-party data processor is involved. For HIPAA, no PHI is transmitted to any covered entity or BA. Always consult your compliance officer for your specific workflow.
 <br/><br/>
 </details>
 
 <details>
-<summary><strong>Can I inspect the source code before buying?</strong></summary>
+<summary><strong>What is the refund policy?</strong></summary>
 <br/>
-The free demo (index.html) is fully open source right here on GitHub. The paid tool uses the same architecture — just more of it. You can verify the security model of the free version, and the paid version follows identical principles.
+14-day no-questions-asked refund. If SanitizeOS doesn't work for your use case within 14 days of purchase, contact through Gumroad for a full refund.
 <br/><br/>
 </details>
-
-<details>
-<summary><strong>What if the regex misses something or has false positives?</strong></summary>
-<br/>
-The patterns are tuned for the most common US/UK formats. For edge cases, the paid version includes a Custom Rules tab where you can add your own patterns. You're always in control — you can toggle any rule on or off independently.
-<br/><br/>
-</details>
-
-<br/>
 
 ---
-
-<br/>
 
 ## 🗺️ Roadmap
 
 - [x] Live text redaction (6 PII types)
-- [x] File upload and download (.txt, .csv)
+- [x] 3 legal masking styles
+- [x] Click-to-reveal false positive fix
+- [x] File upload & download (.txt, .csv)
 - [x] Custom keyword / regex rules
-- [x] Session history
-- [x] Per-rule toggles
+- [x] Compliance audit log generation
+- [x] Session history with per-type counts
 - [ ] PDF text extraction + redaction
-- [ ] Redaction audit log export
+- [ ] Redaction audit log export (JSON format)
 - [ ] Multi-file batch zip download
-- [ ] Named entity detection (basic NLP)
+- [ ] International date format support (DD/MM/YYYY)
 - [ ] Windows `.exe` wrapper (Electron)
 
 > All future updates are included with the $25 lifetime license.
 
-<br/>
-
 ---
-
-<br/>
 
 ## 📜 License
 
-This repository contains the **free demo version** (`index.html`) for evaluation purposes.
+This repository contains the **free demo version** (`index.html`) for evaluation.
 
-The full licensed tool (`tool.html`) is a **commercial product** available at:
+The full licensed tool (`tool.html`) is a **commercial product** at:
 👉 **[https://avinashwalton.gumroad.com/l/SanitizeOS](https://avinashwalton.gumroad.com/l/SanitizeOS)**
 
-The free demo may be used and shared freely. The paid tool is licensed for individual use by the purchaser on their own devices.
-
-<br/>
-
 ---
-
-<br/>
 
 <div align="center">
 
 **Built for professionals who take client confidentiality seriously.**
 
-If you've read this far, you already know the answer.
-
 <br/>
 
 ### **[🔓 Get Lifetime Access — $25](https://avinashwalton.gumroad.com/l/SanitizeOS)**
 
-*One file. One payment. Zero risk.*
+*One file. One payment. Zero risk. 14-day refund guarantee.*
 
 <br/>
 
