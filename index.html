@@ -952,33 +952,48 @@ SanitizeOS will redact everything instantly. 🛡️"></textarea>
     <div class="features-grid mt-24">
       <div class="feature-card fade-in">
         <div class="feature-icon green">🌐</div>
-        <h4>100% Offline</h4>
-        <p>Works without internet. Your data stays on your machine — always. Period.</p>
+        <h4>100% Offline Processing</h4>
+        <p>Works without internet. Your data stays on your machine — always. Verifiable via DevTools Network tab.</p>
       </div>
       <div class="feature-card fade-in">
         <div class="feature-icon blue">⚡</div>
-        <h4>Instant Regex Engine</h4>
-        <p>Real-time detection of 4 PII types: SSN, Credit Cards, Emails, Phone Numbers.</p>
+        <h4>6 PII Types Detected</h4>
+        <p>Email, Phone (US+International), SSN, Credit Cards, IP Addresses, and Dates of Birth — all in real-time.</p>
       </div>
       <div class="feature-card fade-in">
-        <div class="feature-icon red">🔒</div>
-        <h4>Zero Data Logging</h4>
-        <p>No cookies, no analytics, no fingerprinting. Open the file and work.</p>
+        <div class="feature-icon red">🎨</div>
+        <h4>3 Masking Styles</h4>
+        <p>Choose between Solid Black Blocks (█████), [REDACTED - PII] legal-standard, or [CONFIDENTIAL] for your workflow.</p>
       </div>
       <div class="feature-card fade-in">
-        <div class="feature-icon yellow">📁</div>
+        <div class="feature-icon yellow">👆</div>
+        <h4>Click-to-Reveal</h4>
+        <p>Every redacted block is clickable. Instantly toggle back to original text to fix false positives — no re-processing needed.</p>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon purple">📋</div>
+        <h4>Compliance Audit Log</h4>
+        <p>Generate and download a timestamped audit report (.txt) — essential for GDPR, HIPAA, and legal compliance records.</p>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon orange">📁</div>
         <h4>Bulk File Processing</h4>
-        <p>Drop .txt and .csv files — redact thousands of entries in a single click.</p>
+        <p>Drag & drop .txt and .csv files — redact thousands of rows in seconds. Download clean files instantly.</p>
       </div>
       <div class="feature-card fade-in">
-        <div class="feature-icon purple">🔢</div>
-        <h4>Live Detection Stats</h4>
-        <p>See exactly how many of each PII type was found and redacted in real-time.</p>
+        <div class="feature-icon green">⚙️</div>
+        <h4>Custom Rule Engine</h4>
+        <p>Add your own keywords or regex patterns — redact firm names, client IDs, case numbers, or any custom PII.</p>
       </div>
       <div class="feature-card fade-in">
-        <div class="feature-icon orange">💾</div>
+        <div class="feature-icon blue">🕓</div>
+        <h4>Session History</h4>
+        <p>Track every redaction action in your current session with per-type counts. Clears on tab close — nothing stored.</p>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon red">💾</div>
         <h4>One-Time Payment</h4>
-        <p>Pay $25 once. Use forever. No subscription. No renewal. No gotchas.</p>
+        <p>Pay $25 once. Use forever. No subscription. No renewal. No gotchas. All future updates included.</p>
       </div>
     </div>
   </div>
@@ -1033,18 +1048,21 @@ SanitizeOS will redact everything instantly. 🛡️"></textarea>
         <div class="pricing-price"><span>$</span>25</div>
         <p class="pricing-note">One-time payment · No subscription · Use forever</p>
         <ul class="pricing-list">
-          <li><span class="chk">✓</span> Unlimited file uploads (.txt &amp; .csv)</li>
-          <li><span class="chk">✓</span> Bulk redaction — thousands of rows at once</li>
-          <li><span class="chk">✓</span> Download redacted files instantly</li>
-          <li><span class="chk">✓</span> SSN, Credit Card, Email &amp; Phone detection</li>
-          <li><span class="chk">✓</span> Custom keyword redaction (coming soon)</li>
-          <li><span class="chk">✓</span> Future updates included</li>
-          <li><span class="chk">✓</span> Single HTML file — use anywhere, forever</li>
+          <li><span class="chk">✓</span> 6 PII types: Email, Phone, SSN, Card, IP, Date</li>
+          <li><span class="chk">✓</span> 3 masking styles — Black Blocks, [REDACTED-PII], [CONFIDENTIAL]</li>
+          <li><span class="chk">✓</span> Click-to-Reveal — fix false positives without re-processing</li>
+          <li><span class="chk">✓</span> Compliance Audit Log — downloadable .txt report with timestamp</li>
+          <li><span class="chk">✓</span> Bulk file processing — drag &amp; drop .txt / .csv files</li>
+          <li><span class="chk">✓</span> Custom rules engine — add your own keywords or regex</li>
+          <li><span class="chk">✓</span> Session history — per-type redaction counts tracked</li>
+          <li><span class="chk">✓</span> Download &amp; copy clean redacted output</li>
+          <li><span class="chk">✓</span> Single HTML file — works offline, forever, anywhere</li>
+          <li><span class="chk">✓</span> All future updates included — no extra charge</li>
         </ul>
         <a class="btn-buy" href="https://avinashwalton.gumroad.com/l/SanitizeOS" target="_blank" rel="noopener">
           🔓 Get Lifetime Access — $25
         </a>
-        <p class="money-back">🛡 30-day no-questions refund guarantee</p>
+        <p class="money-back">🛡 14-day no-questions refund guarantee</p>
       </div>
     </div>
   </div>
@@ -1109,27 +1127,39 @@ SanitizeOS will redact everything instantly. 🛡️"></textarea>
     <div class="faq-list mt-24">
       <details class="fade-in">
         <summary>Does my data get sent anywhere?</summary>
-        <p>Absolutely not. SanitizeOS runs entirely in your browser using vanilla JavaScript. There is no backend, no API, no server, and no network request made with your data. You can even download the file and run it completely offline.</p>
+        <p>Absolutely not. SanitizeOS runs entirely in your browser using vanilla JavaScript. There is no backend, no API, no server, and no network request made with your data. Open DevTools → Network tab → paste text → watch: zero requests fire.</p>
       </details>
       <details class="fade-in">
         <summary>What PII types does it detect?</summary>
-        <p>Currently: US Social Security Numbers (SSN), credit card numbers (Visa, Mastercard, Amex, Discover), email addresses, and US/UK phone numbers. We're adding custom keyword redaction soon.</p>
+        <p>The paid tool detects 6 types: Email Addresses, US &amp; International Phone Numbers, US SSNs, Credit Card Numbers (Visa, MC, Amex, Discover), IP Addresses, and Dates of Birth. You can also add unlimited custom keyword or regex rules.</p>
+      </details>
+      <details class="fade-in">
+        <summary>What are the 3 masking styles?</summary>
+        <p>You can choose how redacted text looks: <strong>Solid Black Blocks</strong> (█████) for the classic redaction look, <strong>[REDACTED - PII]</strong> for legal-standard labelling, or <strong>[CONFIDENTIAL]</strong> for formal document workflows. Switch between them any time.</p>
+      </details>
+      <details class="fade-in">
+        <summary>What is Click-to-Reveal?</summary>
+        <p>In the output pane, every redacted block is a clickable element. If the regex accidentally masked something that isn't PII (a false positive), just click it to toggle back to the original text — no need to re-process the entire document.</p>
+      </details>
+      <details class="fade-in">
+        <summary>What is the Audit Log feature?</summary>
+        <p>The paid tool includes a dedicated Audit Report tab. Click "Generate Audit Report" to download a timestamped .txt file containing: the date/time, a session ID, and a count of every PII type removed (e.g., "3 Emails, 1 SSN, 2 Phone Numbers"). No actual PII is included — only the summary. Store this file as part of your GDPR or HIPAA compliance records.</p>
       </details>
       <details class="fade-in">
         <summary>What's the difference between the free demo and paid version?</summary>
-        <p>The free live demo lets you redact text you paste manually — great for quick sanitization. The paid version ($25 one-time) unlocks file uploads (.txt/.csv), bulk processing, and the download function.</p>
-      </details>
-      <details class="fade-in">
-        <summary>Is this GDPR / HIPAA compliant?</summary>
-        <p>Since data never leaves your device, SanitizeOS removes the cloud upload vector that most compliance frameworks address. However, compliance is a holistic practice — always consult your compliance officer for your specific use case.</p>
+        <p>The free demo lets you paste text and see it redacted with basic output — great for quick one-off sanitization. The paid version ($25) unlocks: 3 masking styles, click-to-reveal, file uploads (.txt/.csv), bulk processing, custom rules engine, compliance audit log, session history, and download functionality.</p>
       </details>
       <details class="fade-in">
         <summary>What happens after I pay?</summary>
-        <p>You'll receive a download link via Gumroad for the unlocked version of the single index.html file. No account needed — just download and use. Forever. Updates are included.</p>
+        <p>Gumroad delivers the tool file (tool.html) automatically after purchase. No account needed — just download and open in any browser. It works immediately, fully offline, forever.</p>
+      </details>
+      <details class="fade-in">
+        <summary>What is the refund policy?</summary>
+        <p>14-day no-questions-asked refund. If SanitizeOS doesn't work for your use case within 14 days of purchase, email through Gumroad for a full refund.</p>
       </details>
       <details class="fade-in">
         <summary>Can I use this on an air-gapped machine?</summary>
-        <p>Yes! That's one of the core design goals. Download the file, move it to any machine, and it works with zero internet connection required.</p>
+        <p>Yes — that's a core design goal. Download tool.html once, copy it to a USB drive, and it works on any machine with any browser — no internet, no installation, no dependencies.</p>
       </details>
     </div>
   </div>
